@@ -10,20 +10,29 @@ if(isset($_GET['action'])){
     switch($_GET['action']){
         case 'create':
             $crud->create($_POST);
-            $rown = $crud->read();
+            $rows = $crud->read();
             break;
-            case 'read':
-                $rows = $crud->read();
-                break;
-            //case update
-
-            //case delete
-
-            default:
-            $rows =$crud->read();
+        case 'read':
+            $rows = $crud->read();
             break;
+        case 'update':
+            if(isset($_POST['id'])){
+                $crud->update($_POST);
+            }
+            $rows=$crud->read();
+            break;
+            
+        case 'delete':
+            $crud->delete($_GET['id']);
+            $rows = $crud->read();
+            break;
+
+        default:
+        $rows = $crud->read();
+        break;
+        
+
     }
-
 }else{
     $rows = $crud->read();
 }
@@ -31,16 +40,13 @@ if(isset($_GET['action'])){
 
 ?>
 
-
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>crud</title>
+    <title>Crud</title>
+
     <style>
        form{
             max-width:500px;
@@ -48,7 +54,7 @@ if(isset($_GET['action'])){
         }
          label{
             display: flex;
-            margin-top:10px
+            margin-top:10px;
          }
          input[type=text]{
             width:100%;
@@ -105,18 +111,19 @@ if(isset($_GET['action'])){
         a.delete:hover{
             background-color:#c82333;
         }
+    </style>
 
- </style>       
 </head>
 <body>
 
-     <?php
-     
-    if(isset($GET_['action']) && $_GET['action'] == 'update' && isset($GET_['id'])){
+
+<?php  
+
+    if(isset($_GET['action']) && $_GET['action'] == 'update' && isset($_GET['id'])){
         $id = $_GET['id'];
         $result = $crud->readOne($id);
 
-        if($result){
+        if(!$result){
             echo "Registro não encontrado.";
             exit();
         }
@@ -126,57 +133,62 @@ if(isset($_GET['action'])){
         $cor = $result['cor'];
         $ano = $result['ano'];
     
-
 ?>
+    <form action="?action=update" method="POST">
+        <input type="hidden" name="id" value="<?php echo $id ?>">
+        <label for="modelo">Modelo</label>
+        <input type="text" name="modelo" value="<?php echo $modelo ?>">
 
+        <label for="marca">Marca</label>
+        <input type="text" name="marca" value="<?php echo $marca ?>">
 
+        <label for="placa">Placa</label>
+        <input type="text" name="placa" value="<?php echo $placa ?>">
 
+        <label for="cor">Cor</label>
+        <input type="text" name="cor" value="<?php echo $cor ?>">
 
+        <label for="ano">Ano</label>
+        <input type="text" name="ano" value="<?php echo $ano ?>">
 
+        <input type="submit" value="Atualizar" name="enviar"  onclick="return confirm('Certeza que deseja atualizar?')">
+    </form>
 
-
-
-
-
-
-
-
-
-
-
+    <?php }else{?>
 
 
     <form action="?action=create" method="POST">
-        <label for="">modelo</label>
-        <input type= "text" name="modelo">
+        <label for="">Modelo</label>
+        <input type="text" name="modelo">
 
-        <label for="">marca</label>
+        <label for="">Marca</label>
         <input type="text" name="marca">
 
-        <label for="">placa</label>
+        <label for="">Placa</label>
         <input type="text" name="placa">
 
-        <label for="">cor</label>
+        <label for="">Cor</label>
         <input type="text" name="cor">
 
-        <label for="">ano</label>
+        <label for="">Ano</label>
         <input type="text" name="ano">
 
-        <input type="submit" value="cadastrar" name="enviar">
-</form>
+        <input type="submit" value="Cadastrar" name="enviar">
+    </form>
+    <?php }?>
 
-<table>
-    <tr>
-        <td>id</td>
-        <td>modelo</td>
-        <td>marca</td>
-        <td>placa</td>
-        <td>cor</td>
-        <td>ano</td>
-        <td>ações</td>
-    </tr>
 
-    <?php
+    <table>
+        <tr>
+            <td>Id</td>
+            <td>Modelo</td>
+            <td>Marca</td>
+            <td>Placa</td>
+            <td>Cor</td>
+            <td>Ano</td>
+            <td>Ações</td>
+        </tr>
+        <?php
   if($rows->rowCount() == 0){
     echo "<tr>";
     echo "<td colspan='7'>Nenhum dado encontrado</td>";
@@ -191,16 +203,13 @@ if(isset($_GET['action'])){
       echo "<td>" . $row['cor'] . "</td>";
       echo "<td>" . $row['ano'] . "</td>";
       echo "<td>";
-      echo "<a href='?action=update&id=" . $row['id'] . "'>Update</a>";
-      echo "<a href='?action=delete&id=" . $row['id'] . "' onclick='return confirm(\"Tem certeza que quer apagar esse registro?\")' class='delete'>Delete</a>";
+      echo "<a href='?action=update&id=" . $row['id'] . "'>Atualizar</a>";
+      echo "<a href='?action=delete&id=" . $row['id'] . "' onclick='return confirm(\"Tem certeza que quer apagar esse registro?\")' class='delete'>Deletar</a>";
       echo "</td>";
       echo "</tr>";
     }
   }
 ?>
-
-
-</table>    
-        
+    </table>
 </body>
 </html>
